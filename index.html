@@ -1,0 +1,52 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>HW3 Stock Strategy Classifier</title>
+  <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.min.js"></script>
+  <script src="index.js"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table, th, td { border: 1px solid; border-collapse: collapse; padding: 4px 8px; }
+    h1 { color: green; text-align: center; }
+
+    #boxes1:after, #boxes2:after { content: ""; display: block; clear: both; }
+
+    #leftbox   { float: left; width: 40%; box-sizing: border-box; padding: 10px; }
+    #middlebox { float: left; width: 30%; box-sizing: border-box; padding: 10px; }
+    #rightbox  { float: left; width: 30%; box-sizing: border-box; padding: 10px; }
+
+    label { display: inline-block; width: 230px; }
+    input[type=text], select { width: 160px; margin: 2px 0; }
+    .best { background-color: #d4f7d4; font-weight: bold; }
+  </style>
+</head>
+<body onload="loadSiteInfo()">
+  <h1>HW3 Classification: Best Investment Strategy for a Stock (PyTorch DL + XGBoost, ONNX)</h1>
+
+  <div id="boxes1">
+    <div id="leftbox">
+      <h2>Inputs</h2>
+      <div id="example"></div>
+      <label>Sector</label>   <select id="sector"></select><br/>
+      <label>Industry</label> <select id="industry"></select><br/>
+      <div id="numericInputs"></div>
+      <br/>
+      <input style="background-color:yellow" type="button" value="Run" onclick="runBoth()"/>
+    </div>
+
+    <div id="middlebox">
+      <h2>Deep Learning (PyTorch)</h2>
+      <div id="predictionsDL"></div>
+    </div>
+
+    <div id="rightbox">
+      <h2>XGBoost</h2>
+      <div id="predictionsXGB"></div>
+    </div>
+  </div>
+
+  <p>Classes: DCA_Buy_Hold = invest $100 every month and hold; Drawdown60 = buy once after a 60% drop from the high;
+     Year_Sept_April = buy in September, sell the next April.</p>
+</body>
+</html>
