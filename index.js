@@ -48,20 +48,27 @@ function readInputs() {
 }
 
 
-function renderTable(divId, probs) {
+// same idea as the Iris example:  vals, indeces = torch.max( y_pred, dim=1 )
+// -> the index of the largest network output is the predicted INTEGER class
+function argmax(arr) {
   let best = 0;
-  for (let k = 1; k < probs.length; k++) { if (probs[k] > probs[best]) best = k; }
+  for (let k = 1; k < arr.length; k++) { if (arr[k] > arr[best]) best = k; }
+  return best;
+}
 
+
+function renderClass(divId, predClass) {
   let rows = "";
-  for (let k = 0; k < probs.length; k++) {
-    const cls = (k === best) ? ' class="best"' : '';
-    rows += `<tr${cls}><td>${siteInfo.strategy_names[k]}</td><td>${(probs[k] * 100).toFixed(1)}%</td></tr>`;
+  for (let k = 0; k < siteInfo.strategy_names.length; k++) {
+    const cls = (k === predClass) ? ' class="best"' : '';
+    rows += `<tr${cls}><td>${k}</td><td>${siteInfo.strategy_names[k]}</td></tr>`;
   }
 
   document.getElementById(divId).innerHTML = `
-    <hr>Predicted strategy: <b>${siteInfo.strategy_names[best]}</b><br/><br/>
+    <hr>Predicted class (integer): <b style="font-size:1.6em">${predClass}</b><br/>
+    Strategy: <b>${siteInfo.strategy_names[predClass]}</b><br/><br/>
     <table>
-      <tr><th>Strategy</th><th>Probability</th></tr>
+      <tr><th>Class</th><th>Strategy</th></tr>
       ${rows}
     </table>`;
 }
@@ -72,7 +79,8 @@ async function runDL() {
   try {
     const session = await ort.InferenceSession.create("./DLnet_StockStrategy.onnx?v=" + Date.now());
     const results = await session.run({ input1: tensorX });
-    renderTable('predictionsDL', results.output1.data);   // softmax probabilities, length 3
+    const predClass = argmax(results.output1.data);        // integer class 0, 1 or 2
+    renderClass('predictionsDL', predClass);
   } catch (e) {
     console.error("ONNX runtime error:", e);
     alert("Error: " + e.message);
@@ -85,7 +93,8 @@ async function runXGB() {
   try {
     const session = await ort.InferenceSession.create("./xgboost_StockStrategy_ort.onnx?v=" + Date.now());
     const results = await session.run({ float_input: tensorX });
-    renderTable('predictionsXGB', results.probabilities.data);
+    const predClass = Number(results.label.data[0]);       // XGBoost 'label' output is already an integer class
+    renderClass('predictionsXGB', predClass);
   } catch (e) {
     console.error("ONNX runtime error:", e);
     alert("Error: " + e.message);
