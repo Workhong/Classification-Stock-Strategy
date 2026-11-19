@@ -8,5 +8,6 @@ Files:
 - `index.html`, `index.js` – web page, runs the models in the browser with onnxruntime-web
 - `DLnet_StockStrategy.onnx` – PyTorch deep learning model (2 hidden layers), input `input1` [1,10], output `output1`; the page converts it to an integer class with argmax (like `torch.max(y_pred, dim=1)`)
 - `xgboost_StockStrategy_ort.onnx` – XGBoost model, input `float_input` [1,10], the page uses the integer `label` output
+- Both ONNX models use **opset 15** (as recommended in class)
 - `site_info.json` – feature names, Sector/Industry/strategy label maps, example stock
 - `HW3_classification.ipynb` – full training / evaluation notebook
